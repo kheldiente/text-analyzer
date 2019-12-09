@@ -2,10 +2,13 @@ import sys
 import threading
 import time
 
-data = "My name is Michael Diente."
-
 start_time = time.time()
 shared_lock = threading.Lock()
+threads = []
+
+sentence_count = 0
+word_count = 0
+character_count = 0
 
 class SentenceAnalyzer(threading.Thread):
     def __init__(self, data):
@@ -14,30 +17,31 @@ class SentenceAnalyzer(threading.Thread):
 
     def run(self):
         global shared_lock
+        global sentence_count
         shared_lock.acquire()
 
-        sentences = data.replace("?", ".")
-        sentences = sentences.replace("!", ".")
+        print("Running sentence analyzer...")
+        sentences = data.replace("?", ".").replace("!", ".")
+        sentence_count = sentences.count(".")
 
-        count = sentences.count(".")
-        print("Number of sentences: %i" % (count))
-
+        print("Releasing sentence analyzer...")
         shared_lock.release()
 
 class WordAnalyzer(threading.Thread):
     def __init__(self, data):
         threading.Thread.__init__(self)
         self.data = data
-    
+
     def run(self):
         global shared_lock
+        global word_count
         shared_lock.acquire()
 
+        print("Running word analyzer...")
         words = data.split()
-        
-        count = len(words)
-        print("Number of words: %i" % (count))
+        word_count = len(words)
 
+        print("Releasing word analyzer...")
         shared_lock.release()
 
 class CharacterAnalyzer(threading.Thread):
@@ -47,14 +51,14 @@ class CharacterAnalyzer(threading.Thread):
 
     def run(self):
         global shared_lock
+        global character_count
         shared_lock.acquire()
         
-        characters = data.replace(" ", "")
-        characters = characters.replace("\n", "")
+        print("Running character analyzer...")
+        characters = data.replace(" ", "").replace("\n", "")
+        character_count = len(characters)
 
-        count = len(characters)
-        print("Number of characters (excluding spaces) %i" % (count))
-
+        print("Releasing character analyzer...")
         shared_lock.release()
 
 
@@ -62,8 +66,12 @@ if __name__  == "__main__":
     arguments = len(sys.argv) - 1
     if (arguments == 1):
         filePath = sys.argv[1]
-        print("Reading text file: %s...\n" % (filePath))
+        print("Reading text file: %s..." % (filePath))
 
+        file = open(filePath)
+        data = file.read()
+
+        print("Running 3 threads...\n")
         t1 = WordAnalyzer(data)
         t2 = SentenceAnalyzer(data)
         t3 = CharacterAnalyzer(data)
@@ -72,10 +80,17 @@ if __name__  == "__main__":
         t2.start()
         t3.start()
 
-        t1.join()
-        t2.join()
-        t3.join()
+        threads.append(t1)
+        threads.append(t2)
+        threads.append(t3)
 
+        # Wait for all threads to finish
+        for thread in threads:
+            thread.join()
+
+        print("\nNumber of sentences: %i" % (sentence_count))
+        print("Number of words: %i" % (word_count))
+        print("Number of characters (excluding spaces): %i" % (character_count))
         print("\nTime elapsed: %s second(s)" % (time.time() - start_time))
     else:
-        print("Please provide text file path to analyze")
+        print("Please provide text file path to analyze. Run python text-analyzer-multi-threading.py <.txt>")
