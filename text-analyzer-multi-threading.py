@@ -3,7 +3,6 @@ import threading
 import time
 
 start_time = time.time()
-shared_lock = threading.Lock()
 threads = []
 
 sentence_count = 0
@@ -17,15 +16,10 @@ class SentenceAnalyzer(threading.Thread):
 
     def run(self):
         global sentence_count
-        global shared_lock
-        shared_lock.acquire()
 
-        print("Running sentence analyzer...")
+        print("Counting sentences...")
         sentences = data.replace("?", ".").replace("!", ".")
         sentence_count = sentences.count(".")
-
-        print("Releasing sentence analyzer...")
-        shared_lock.release()
 
 class WordAnalyzer(threading.Thread):
     def __init__(self, data):
@@ -34,15 +28,11 @@ class WordAnalyzer(threading.Thread):
 
     def run(self):
         global word_count
-        global shared_lock
-        shared_lock.acquire()
 
-        print("Running word analyzer...")
+        print("Counting words...")
         words = data.split()
         word_count = len(words)
 
-        print("Releasing word analyzer...")
-        shared_lock.release()
 
 class CharacterAnalyzer(threading.Thread):
     def __init__(self, data):
@@ -51,16 +41,10 @@ class CharacterAnalyzer(threading.Thread):
 
     def run(self):
         global character_count
-        global shared_lock
-        shared_lock.acquire()
         
-        print("Running character analyzer...")
+        print("Counting characters...")
         characters = data.replace(" ", "").replace("\n", "")
         character_count = len(characters)
-
-        print("Releasing character analyzer...")
-        shared_lock.release()
-
 
 if __name__  == "__main__":
     arguments = len(sys.argv) - 1
