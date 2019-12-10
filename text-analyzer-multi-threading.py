@@ -16,8 +16,8 @@ class SentenceAnalyzer(threading.Thread):
         self.data = data
 
     def run(self):
-        global shared_lock
         global sentence_count
+        global shared_lock
         shared_lock.acquire()
 
         print("Running sentence analyzer...")
@@ -33,8 +33,8 @@ class WordAnalyzer(threading.Thread):
         self.data = data
 
     def run(self):
-        global shared_lock
         global word_count
+        global shared_lock
         shared_lock.acquire()
 
         print("Running word analyzer...")
@@ -50,8 +50,8 @@ class CharacterAnalyzer(threading.Thread):
         self.data = data
 
     def run(self):
-        global shared_lock
         global character_count
+        global shared_lock
         shared_lock.acquire()
         
         print("Running character analyzer...")
@@ -72,8 +72,8 @@ if __name__  == "__main__":
         data = file.read()
 
         print("Running 3 threads...\n")
-        t1 = WordAnalyzer(data)
-        t2 = SentenceAnalyzer(data)
+        t1 = SentenceAnalyzer(data)
+        t2 = WordAnalyzer(data)
         t3 = CharacterAnalyzer(data)
 
         t1.start()
