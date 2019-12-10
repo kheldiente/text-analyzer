@@ -17,12 +17,15 @@ class TextAnalyzer(threading.Thread):
         global word_count
         global character_count
 
+        print("Counting sentences...")
         sentences = data.replace("?", ".").replace("!", ".")
         sentence_count = sentences.count(".")
 
+        print("Counting words...")
         words = data.split()
         word_count = len(words)
 
+        print("Counting characters...")
         characters = data.replace(" ", "").replace("\n", "")
         character_count = len(characters)
 
@@ -41,7 +44,7 @@ if __name__  == "__main__":
         t1.start()
         t1.join()
 
-        print("Number of sentences: %i" % (sentence_count))
+        print("\nNumber of sentences: %i" % (sentence_count))
         print("Number of words: %i" % (word_count))
         print("Number of characters (excluding spaces): %i" % (character_count))
         print("\nTime elapsed: %s second(s)" % (time.time() - start_time))
