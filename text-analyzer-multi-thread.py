@@ -4,19 +4,18 @@ import time
 
 start_time = time.time()
 shared_lock = threading.Lock()
-threads = []
 
 sentence_count = 0
 word_count = 0
 character_count = 0
 
-class SentenceAnalyzer(threading.Thread):
+class SentenceCounter(threading.Thread):
     def __init__(self, data):
         threading.Thread.__init__(self)
         self.data = data
 
     def run(self):
-        print("Counting sentences...")
+        print("\nCounting sentences...")
         global shared_lock
         global sentence_count
 
@@ -25,13 +24,13 @@ class SentenceAnalyzer(threading.Thread):
         sentence_count = sentences.count(".")
         shared_lock.release()
 
-class WordAnalyzer(threading.Thread):
+class WordCounter(threading.Thread):
     def __init__(self, data):
         threading.Thread.__init__(self)
         self.data = data
 
     def run(self):
-        print("Counting words...")
+        print("\nCounting words...")
         global shared_lock
         global word_count
 
@@ -41,13 +40,13 @@ class WordAnalyzer(threading.Thread):
         shared_lock.release()
 
 
-class CharacterAnalyzer(threading.Thread):
+class CharacterCounter(threading.Thread):
     def __init__(self, data):
         threading.Thread.__init__(self)
         self.data = data
 
     def run(self):
-        print("Counting characters...")
+        print("\nCounting characters...")
         global shared_lock
         global character_count
 
@@ -66,21 +65,17 @@ if __name__  == "__main__":
         data = file.read()
 
         print("Running 3 threads...\n")
-        t1 = SentenceAnalyzer(data)
-        t2 = WordAnalyzer(data)
-        t3 = CharacterAnalyzer(data)
+        t1 = SentenceCounter(data)
+        t2 = WordCounter(data)
+        t3 = CharacterCounter(data)
 
         t1.start()
         t2.start()
         t3.start()
 
-        threads.append(t1)
-        threads.append(t2)
-        threads.append(t3)
-
-        # Wait for all threads to finish
-        for thread in threads:
-            thread.join()
+        t1.join()
+        t2.join()
+        t3.join()
 
         print("\nNumber of sentences: %i" % (sentence_count))
         print("Number of words: %i" % (word_count))
